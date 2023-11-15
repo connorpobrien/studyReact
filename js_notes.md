@@ -185,3 +185,57 @@ const fetchData = async() => {
 
 fetchData();
 ```
+
+## User Input
+
+```js
+import React, { useState, useEffect } from 'react';
+
+function MyComponent() {
+  const [inputValue, setInputValue] = useState('');
+  const [loading, setLoading] = useState(false);
+  const abortController = new AbortController();
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('https://api.example.com/data?query=' + encodeURIComponent(inputValue), {
+        signal: abortController.signal
+      });
+      const data = await response.json();
+      // Handle your data here
+      setLoading(false);
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        // Handle the error here
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleClick = () => {
+    fetchData();
+  };
+
+  useEffect(() => {
+    // Cleanup function to cancel the request if the component unmounts
+    return () => abortController.abort();
+  }, []);
+
+  return (
+    <div>
+      <input type="text" value={inputValue} onChange={handleInputChange} />
+      <button onClick={handleClick} disabled={loading}>
+        {loading ? 'Loading...' : 'Submit'}
+      </button>
+    </div>
+  );
+}
+
+export default MyComponent;
+
+```

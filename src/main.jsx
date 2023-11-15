@@ -1,9 +1,19 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
+import { TodoItem } from "./TodoItem"
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-)
+export function TodoList({ todos, toggleTodo, deleteTodo }) {
+  return (
+    <ul className="list">
+      {todos.length === 0 && "No Todos"}
+      {todos.map(todo => {
+        return (
+          <TodoItem
+            {...todo}
+            key={todo.id}
+            toggleTodo={toggleTodo}
+            deleteTodo={deleteTodo}
+          />
+        )
+      })}
+    </ul>
+  )
+}
