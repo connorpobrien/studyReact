@@ -239,3 +239,56 @@ function MyComponent() {
 export default MyComponent;
 
 ```
+
+
+```ts
+import React, { useState, useEffect, ChangeEvent, MouseEvent } from 'react';
+
+function MyComponent() {
+  const [inputValue, setInputValue] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const abortController = new AbortController();
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('https://api.example.com/data?query=' + encodeURIComponent(inputValue), {
+        signal: abortController.signal
+      });
+      const data = await response.json();
+      // Handle your data here
+      setLoading(false);
+    } catch (error) {
+      if (error instanceof Error && error.name !== 'AbortError') {
+        // Handle the error here
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
+    fetchData();
+  };
+
+  useEffect(() => {
+    // Cleanup function to cancel the request if the component unmounts
+    return () => abortController.abort();
+  }, []);
+
+  return (
+    <div>
+      <input type="text" value={inputValue} onChange={handleInputChange} />
+      <button onClick={handleClick} disabled={loading}>
+        {loading ? 'Loading...' : 'Submit'}
+      </button>
+    </div>
+  );
+}
+
+export default MyComponent;
+
+```
